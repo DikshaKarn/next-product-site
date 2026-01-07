@@ -1,18 +1,40 @@
 'use client';
 import largeData from '@/src/mock/large/products.json';
 import smallData from '@/src/mock/small/products.json';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 
 const PAGE_SIZE = 20;
 
 export default function Products() {
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
   const data = [...largeData, ...smallData];
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
+
+  const filteredData = useMemo(() => {
+    const sq = searchQuery.trim().toLowerCase();
+
+    // If combined search provided, filter by name OR category
+    if (sq) {
+      return data.filter((p) => {
+        const name = sq.length >= 5 ? (p.name || '').toLowerCase() : '';
+        const category = (p.category || '').toLowerCase();
+        return name?.includes(sq) || category.includes(sq);
+      });
+    }
+
+    // No filters -> return all
+    return data;
+  }, [data, searchQuery]);
+
   const startIndex = (currentPage - 1) * PAGE_SIZE;
   const endIndex = startIndex + PAGE_SIZE;
-  const productData = data.slice(startIndex, endIndex);
-  const totalPages = Math.ceil(data.length / PAGE_SIZE);
+  const productData = filteredData.slice(startIndex, endIndex);
+  const totalPages = Math.max(1, Math.ceil(filteredData.length / PAGE_SIZE));
 
   const nextPage = () => {
     setCurrentPage(currentPage + 1);
@@ -26,8 +48,28 @@ export default function Products() {
     window.scrollTo(0, 0);
   }, [currentPage]);
 
+  useEffect(() => {
+    if (currentPage > totalPages) setCurrentPage(1);
+  }, [totalPages, currentPage]);
+
   return (
     <main className='flex min-h-screen flex-col items-center p-24'>
+      <div id='DikshaSearch' className='w-full max-w-5xl mb-6 grid gap-3'>
+        <div>
+          <label className='block mb-2 font-medium'>Search (name(min 5 chars) or category)</label>
+          <div className='flex gap-2'>
+            <input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder='Search products by name or category'
+              className='w-full rounded border px-3 py-2'
+            />
+            <button onClick={() => setSearchQuery('')} className='px-3 py-2 border rounded'>
+              Clear
+            </button>
+          </div>
+        </div>
+      </div>
       <div className='z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex'>
         <div className='grid lg:max-w-5xl lg:w-full lg:grid-cols-2 lg:text-left'>
           {productData.map((product) => (
