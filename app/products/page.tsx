@@ -11,6 +11,11 @@ export default function Products() {
   const [searchQuery, setSearchQuery] = useState('');
   const data = [...largeData, ...smallData];
 
+  // unique categories for datalist
+  const categories = useMemo(() => {
+    return Array.from(new Set(data.map((p) => p.category))).sort();
+  }, [data]);
+
   useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery]);
@@ -59,6 +64,7 @@ export default function Products() {
           <label className='block mb-2 font-medium'>Search (name(min 5 chars) or category)</label>
           <div className='flex gap-2'>
             <input
+              list='categories'
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder='Search products by name or category'
@@ -68,6 +74,11 @@ export default function Products() {
               Clear
             </button>
           </div>
+          <datalist id='categories'>
+            {categories.map((c) => (
+              <option key={c} value={c} />
+            ))}
+          </datalist>
         </div>
       </div>
       <div className='z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex'>
