@@ -41,6 +41,13 @@ The code uses (p.name || '') and (p.category || '') to avoid undefined values.
 If sq is empty, it returns the full data array (no filtering).
 Purpose: provide a combined search that always matches categories but only attempts name matches for sufficiently long queries, while caching results for performance.
 
+**41-42**:
+productData = filteredData.slice(startIndex, endIndex)
+Takes the subarray of filteredData for the current page: items from startIndex (inclusive) up to but not including endIndex. This implements client-side pagination by selecting only the page's items to render.
+totalPages = Math.max(1, Math.ceil(filteredData.length / PAGE_SIZE))
+Computes how many pages are needed: divide the total filtered item count by PAGE_SIZE and round up with Math.ceil.
+Math.max(1, ...) ensures the UI reports at least one page (so when there are zero results the page count shown is 1 instead of 0), avoiding edge cases with zero pages.
+
 **Testing locally**:
 
 1. Start dev server:

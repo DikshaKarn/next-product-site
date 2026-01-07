@@ -21,7 +21,7 @@ export default function Products() {
   }, [searchQuery]);
 
   const filteredData = useMemo(() => {
-    const sq = searchQuery.trim().toLowerCase();
+    const sq = searchQuery.trim().toLowerCase(); // to ignore extra spaces and letter-case differences
 
     // If combined search provided, filter by name OR category
     if (sq) {
@@ -50,7 +50,7 @@ export default function Products() {
   };
 
   useEffect(() => {
-    window.scrollTo(0, 0);
+    window.scrollTo(0, 0); // Scroll to top on page change
   }, [currentPage]);
 
   useEffect(() => {
