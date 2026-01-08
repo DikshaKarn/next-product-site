@@ -23,7 +23,7 @@ export default function CartView() {
           <li key={it.id} className='flex items-center justify-between'>
             <div className='flex items-center gap-4'>
               <img
-                src={it.image || '/public/placeholder.png'}
+                src={it.image || '/public/cart.png'}
                 alt={it.name}
                 className='w-16 h-16 object-cover rounded'
               />

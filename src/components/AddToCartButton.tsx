@@ -12,10 +12,10 @@ type Props = {
 };
 
 export default function AddToCartButton({ id, name, price, image, countInStock = 999 }: Props) {
-  const { addItem } = useCart();
-  const [qty, setQty] = useState<number>(1);
+  const { addItem } = useCart();   // customReact-hook exposed cart actions & here destructure the addItem
+  const [qty, setQty] = useState<number>(1);  // local state for quantity input
   const router = useRouter();
-  const [isAdding, setIsAdding] = useState(false);
+  const [isAdding, setIsAdding] = useState(false); // local state to prevent multiple duplicate adds
 
   const handleAdd = async () => {
     if (isAdding) return;
