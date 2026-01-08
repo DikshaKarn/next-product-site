@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 export type CartItem = {
+  // shape of a cart item
   id: string;
   name: string;
   price: number;
@@ -10,6 +11,7 @@ export type CartItem = {
 };
 
 type CartContextType = {
+  // shape of the cart context
   items: CartItem[];
   addItem: (item: CartItem) => void;
   updateQty: (id: string, qty: number) => void;
@@ -18,9 +20,10 @@ type CartContextType = {
   subtotal: number;
 };
 
-const CartContext = createContext<CartContextType | undefined>(undefined);
+const CartContext = createContext<CartContextType | undefined>(undefined); // create context
 
 export const useCart = () => {
+  // custom hook for consuming cart context
   const ctx = useContext(CartContext);
   if (!ctx) throw new Error('useCart must be used within CartProvider');
   return ctx;
@@ -45,6 +48,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     } catch {}
   }, [items]);
 
+  // updates localStorage synchronously inside the setItems callback using the computed next array, ensuring persistence even before React state actually re-renders
   const addItem = (item: CartItem) => {
     // coerce price and quantity to numbers
     const normalized = {
@@ -59,7 +63,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       if (idx >= 0) {
         const copy = [...prev];
         const prevQty = Number(copy[idx].quantity || 0);
-        copy[idx] = { ...copy[idx], quantity: Math.max(1, prevQty + normalized.quantity) };
+        copy[idx] = { ...copy[idx], quantity: Math.max(1, prevQty + normalized.quantity) }; // normalizes price/quantity, if item exists increments quantity (clamped to >=1), otherwise appends; writes updated array to localStorage
         next = copy;
       } else {
         next = [...prev, normalized];
@@ -82,8 +86,10 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
   const clear = () => setItems([]);
 
-  const subtotal = useMemo(() => items.reduce((s, i) => s + Number(i.price) * i.quantity, 0), [items]);
+  //  to avoid recomputing on unrelated renders.
+  const subtotal = useMemo(() => items.reduce((s, i) => s + Number(i.price) * i.quantity, 0), [items]); // Computes subtotal with useMemo for cheap derived state.
 
+  // provide context value And can be used by any child component
   return (
     <CartContext.Provider value={{ items, addItem, updateQty, removeItem, clear, subtotal }}>
       {children}

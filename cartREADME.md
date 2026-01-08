@@ -374,6 +374,14 @@ This architecture supports:
 
 ---
 
+## preview Email:
+
+Where the email HTML is built: the route maps items to itemsHtml then injects it and shipping/total into the template string assigned to html (the <p> / <ul> template in the file).
+How the preview URL is created: when the code sends mail via Nodemailer (the transporter.sendMail(...) path) it receives an info object; nodemailer.getTestMessageUrl(info) returns an Ethereal preview URL if the transporter was created with an Ethereal test account. That value is assigned to previewUrl.
+When preview is returned to the client: the route returns JSON that includes emailPreview: previewUrl (or null if none). The client (page.tsx) reads that and shows a preview link when present.
+Why SendGrid path has no preview: SendGrid sends the message via the provider API and does not produce an Ethereal-style preview URL, so the code returns emailPreview: null for the SendGrid branch.
+Practical notes: to get a preview URL locally, run without real SMTP/SendGrid env vars so the code falls back to Nodemailer’s createTestAccount() (Ethereal). The preview URL will also be logged by the route. If you want previews when using a real SMTP or SendGrid, you must use their provider tooling (or persist the HTML server-side and expose it).
+
 ## 18. Summary
 
 This PR introduces a **clean, scalable, and decoupled** cart + checkout system using:

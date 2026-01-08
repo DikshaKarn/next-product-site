@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 import sendgrid from '@sendgrid/mail';
 
-export async function POST(req: Request) {
+export async function POST(req: Request) {  // API route to create order and send confirmation email
   try {
     const body = await req.json();
     const { items, shipping, total } = body;
